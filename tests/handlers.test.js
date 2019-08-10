@@ -1,0 +1,91 @@
+const { createApplication } = require("../");
+
+const wait = waitTime => new Promise(resolve => setTimeout(() => resolve(), waitTime));
+
+describe("handler", () => {
+  describe("calling ok", () => {
+    describe("with no body", () => {
+      it("returns 204 status", async () => {
+        const app = createApplication();
+
+        app.addHandler("test", async (req, res) => res.ok());
+
+        const result = await app.export().test();
+
+        expect(result.statusCode).toEqual(204);
+      });
+    });
+
+    describe("with body", () => {
+      it("returns 200 status", async () => {
+        const app = createApplication();
+
+        app.addHandler("test", async (req, res) => res.ok({}));
+
+        const result = await app.export().test();
+
+        expect(result.statusCode).toEqual(200);
+      });
+
+      it("returns the stringified body", async () => {
+        const app = createApplication();
+
+        app.addHandler("test", async (req, res) => res.ok({ x: 1 }));
+
+        const result = await app.export().test();
+
+        expect(result.body).toEqual(JSON.stringify({ x: 1 }));
+      });
+    });
+
+    it("with headers", async () => {
+      const app = createApplication();
+
+      app.addHandler("test", async (req, res) => {
+        res
+          .set("X-Header", "1")
+          .ok();
+      });
+
+      const result = await app.export().test();
+
+      expect(result.headers).toEqual({
+        "X-Header": "1",
+      });
+    });
+  });
+
+  describe("multiple handlers", () => {
+    it("only calls the first handler that sets a response", async () => {
+      const app = createApplication();
+
+      app.addHandler(
+        "test",
+        async (req, res) => {
+          await wait(10);
+
+          res.forbidden();
+        },
+        (req, res) => res.ok(),
+      );
+
+      const result = await app.export().test();
+
+      expect(result.statusCode).toEqual(403);
+    });
+
+    it("calls the second handler if no response is set", async () => {
+      const app = createApplication();
+
+      app.addHandler(
+        "test",
+        async () => {},
+        (req, res) => res.ok(),
+      );
+
+      const result = await app.export().test();
+
+      expect(result.statusCode).toEqual(204);
+    });
+  });
+});
