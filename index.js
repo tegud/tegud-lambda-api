@@ -1,27 +1,36 @@
+const Request = require("./lib/request");
 const Response = require("./lib/response");
 
 module.exports = {
   createApplication: () => {
-    const createHandler = handlers => async () => {
+    const endpoints = {};
+    const globalHandlers = [];
+
+    const createHandler = handlers => async (event, context) => {
+      const request = new Request(event, context);
       const response = new Response();
-      const remainingHandlers = [...handlers];
+      const remainingHandlers = [
+        ...globalHandlers,
+        ...handlers,
+      ];
 
       while (!response.isFinalised() && remainingHandlers.length) {
         const handler = remainingHandlers.shift();
 
-        await handler(undefined, response); // eslint-disable-line no-await-in-loop
+        await handler(request, response); // eslint-disable-line no-await-in-loop
       }
 
       return response.result();
     };
 
-    const handlers = {};
-
     return {
-      addHandler: (name, ...endpointHandlers) => {
-        handlers[name] = createHandler(endpointHandlers);
+      use: (handler) => {
+        globalHandlers.push(handler);
       },
-      export: () => ({ ...handlers }),
+      addHandler: (name, ...endpointHandlers) => {
+        endpoints[name] = createHandler(endpointHandlers);
+      },
+      export: () => ({ ...endpoints }),
     };
   },
 };

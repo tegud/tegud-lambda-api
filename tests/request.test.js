@@ -89,5 +89,13 @@ describe("request", () => {
 
       expect(request.function.name).toEqual("myFunction");
     });
+
+    it("version is set", () => {
+      const request = new Request({ }, {
+        functionVersion: "$LATEST",
+      });
+
+      expect(request.function.version).toEqual("$LATEST");
+    });
   });
 });

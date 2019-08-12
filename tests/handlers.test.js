@@ -88,4 +88,36 @@ describe("handler", () => {
       expect(result.statusCode).toEqual(204);
     });
   });
+
+  describe("request", () => {
+    it("is passed to the handler with event", async () => {
+      const app = createApplication();
+      let request;
+
+      app.addHandler("test", async (req, res) => {
+        request = req;
+
+        res.ok();
+      });
+
+      await app.export().test({ httpMethod: "POST" });
+
+      expect(request.method).toEqual("POST");
+    });
+
+    it("is passed to the handler with context", async () => {
+      const app = createApplication();
+      let request;
+
+      app.addHandler("test", async (req, res) => {
+        request = req;
+
+        res.ok();
+      });
+
+      await app.export().test({ }, { functionName: "test" });
+
+      expect(request.function.name).toEqual("test");
+    });
+  });
 });
