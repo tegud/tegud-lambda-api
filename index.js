@@ -23,14 +23,20 @@ module.exports = {
       return response.result();
     };
 
-    return {
+    const application = {
       use: (handler) => {
         globalHandlers.push(handler);
+
+        return application;
       },
       addHandler: (name, ...endpointHandlers) => {
         endpoints[name] = createHandler(endpointHandlers);
+
+        return application;
       },
       export: () => ({ ...endpoints }),
     };
+
+    return application;
   },
 };
