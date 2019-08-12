@@ -23,6 +23,17 @@ describe("request", () => {
     expect(request.query).toEqual({ x: 1, y: 2 });
   });
 
+  it("body is set from event body", () => {
+    const request = new Request({
+      body: {
+        x: 1,
+        y: 2,
+      },
+    });
+
+    expect(request.body).toEqual({ x: 1, y: 2 });
+  });
+
   it("method is set from event httpMethod", () => {
     const request = new Request({
       httpMethod: "POST",
