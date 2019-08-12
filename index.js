@@ -20,6 +20,8 @@ module.exports = {
         await handler(request, response); // eslint-disable-line no-await-in-loop
       }
 
+      response.emit("end");
+
       return response.result();
     };
 

@@ -120,4 +120,21 @@ describe("handler", () => {
       expect(request.function.name).toEqual("test");
     });
   });
+
+  it("emits response end event", async () => {
+    const app = createApplication();
+    let completePromise;
+
+    app.addHandler("test", async (req, res) => {
+      completePromise = new Promise(resolve => res.on("end", () => {
+        resolve();
+      }));
+      res.ok();
+    });
+
+    const result = await app.export().test();
+    await completePromise;
+
+    expect(result.statusCode).toEqual(204);
+  });
 });
