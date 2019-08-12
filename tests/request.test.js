@@ -97,5 +97,20 @@ describe("request", () => {
 
       expect(request.function.version).toEqual("$LATEST");
     });
+
+    it("arn is set", () => {
+      const request = new Request({ }, {
+        invokedFunctionArn: "arn:aws:lambda:eu-west-2:123456:function:my-function",
+      });
+
+      expect(request.function.arn).toEqual({
+        full: "arn:aws:lambda:eu-west-2:123456:function:my-function",
+        resource: "lambda",
+        region: "eu-west-2",
+        accountId: "123456",
+        resourceType: "function",
+        functionName: "my-function",
+      });
+    });
   });
 });
