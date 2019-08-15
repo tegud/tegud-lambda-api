@@ -1,6 +1,6 @@
 {
   "name": "tegud-lambda-api",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Helper functions to simplify AWS Lambda API Development",
   "main": "index.js",
   "scripts": {
