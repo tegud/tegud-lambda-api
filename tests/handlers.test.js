@@ -137,4 +137,24 @@ describe("handler", () => {
 
     expect(result.statusCode).toEqual(204);
   });
+
+  it("executes handleComplete handlers last", async () => {
+    const executionOrder = [];
+    const app = createApplication();
+
+    app
+      .use(async () => {
+        executionOrder.push(1);
+      })
+      .addHandler("test", async (req, res) => {
+        executionOrder.push(2);
+        res.ok();
+      })
+      .handleComplete(async () => {
+        executionOrder.push(3);
+      });
+
+    await app.export().test({ }, { functionName: "test" });
+    expect(executionOrder).toEqual([1, 2, 3]);
+  });
 });

@@ -5,6 +5,7 @@ module.exports = {
   createApplication: () => {
     const endpoints = {};
     const globalHandlers = [];
+    const completeHandlers = [];
 
     const createHandler = handlers => async (event, context) => {
       const request = new Request(event, context);
@@ -22,6 +23,13 @@ module.exports = {
 
       response.emit("end");
 
+      const remainingCompleteHandlers = [...completeHandlers];
+      while (remainingCompleteHandlers.length) {
+        const handler = remainingCompleteHandlers.shift();
+
+        await handler(request, response); // eslint-disable-line no-await-in-loop
+      }
+
       return response.result();
     };
 
@@ -33,6 +41,11 @@ module.exports = {
       },
       addHandler: (name, ...endpointHandlers) => {
         endpoints[name] = createHandler(endpointHandlers);
+
+        return application;
+      },
+      handleComplete: (handler) => {
+        completeHandlers.push(handler);
 
         return application;
       },
