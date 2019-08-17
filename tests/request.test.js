@@ -1,6 +1,12 @@
+const MockDate = require("mockdate");
+
 const Request = require("../lib/request");
 
 describe("request", () => {
+  afterEach(() => {
+    MockDate.reset();
+  });
+
   it("params is set from event pathParameters", () => {
     const request = new Request({
       pathParameters: {
@@ -89,6 +95,26 @@ describe("request", () => {
       });
 
       expect(request.ip).toEqual("127.0.0.1");
+    });
+  });
+
+  describe("timing info", () => {
+    it("sets received timestamp", () => {
+      const request = new Request({
+        requestContext: {
+          requestTime: "11/Aug/2019:21:42:37 +0000",
+        },
+      });
+
+      expect(request.timings.received).toEqual(1565559757000);
+    });
+
+    it("sets started timestamp", () => {
+      MockDate.set(1565559757000);
+
+      const request = new Request({});
+
+      expect(request.timings.started).toEqual(1565559757000);
     });
   });
 
