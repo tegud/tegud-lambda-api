@@ -45,6 +45,17 @@ describe("response", () => {
       });
     });
 
+    it("setHeader sets header to specified value", () => {
+      const response = new Response();
+
+      response
+        .setHeader("X-Header", "123")
+        .ok();
+
+      const { headers } = response.result();
+      expect(headers["X-Header"]).toBe("123");
+    });
+
     describe("common headers", () => {
       [
         { method: "contentType", header: "Content-Type", value: "application/json" },
