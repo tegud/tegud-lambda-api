@@ -5,13 +5,13 @@ describe("application", () => {
     it("adds handler to all endpoints", async () => {
       const app = createApplication();
 
-      app.use((req) => {
+      app.use(async (req) => {
         req.x = 1;
       });
 
       app.addHandler(
         "test",
-        (req, res) => {
+        async (req, res) => {
           if (req.x === 1) {
             res.ok();
           }
@@ -27,10 +27,10 @@ describe("application", () => {
       const app = createApplication();
 
       app
-        .use(() => { })
+        .use(async () => { })
         .addHandler(
           "test",
-          (req, res) => {
+          async (req, res) => {
             res.ok();
           },
         );
@@ -40,6 +40,29 @@ describe("application", () => {
       expect(result.statusCode).toEqual(204);
     });
 
+    it("handles callback", async () => {
+      const app = createApplication();
+      let callbackAsyncCalled = false;
+
+      app
+        .use((req, res, next) => {
+          setTimeout(() => {
+            callbackAsyncCalled = true;
+            next();
+          }, 10);
+        })
+        .addHandler(
+          "test",
+          async (req, res) => {
+            res.ok();
+          },
+        );
+
+      await app.export().test();
+
+      expect(callbackAsyncCalled).toEqual(true);
+    });
+
     describe("nests applications", () => {
       it("executes parent and child handlers", async () => {
         const app = createApplication();
@@ -47,24 +70,24 @@ describe("application", () => {
         const items = [];
 
         app
-          .use(() => {
+          .use(async () => {
             items.push(1);
           })
-          .handleComplete(() => {
+          .handleComplete(async () => {
             items.push(5);
           })
           .use(nestedApp);
 
         nestedApp
-          .use(() => {
+          .use(async () => {
             items.push(2);
           })
-          .handleComplete(() => {
+          .handleComplete(async () => {
             items.push(4);
           })
           .addHandler(
             "test",
-            (req, res) => {
+            async (req, res) => {
               items.push(3);
               res.ok();
             },
@@ -82,10 +105,10 @@ describe("application", () => {
       const app = createApplication();
 
       app
-        .addHandler("testTwo", () => { })
+        .addHandler("testTwo", async () => { })
         .addHandler(
           "test",
-          (req, res) => {
+          async (req, res) => {
             res.ok();
           },
         );

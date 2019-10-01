@@ -80,7 +80,7 @@ describe("handler", () => {
       app.addHandler(
         "test",
         async () => {},
-        (req, res) => res.ok(),
+        async (req, res) => res.ok(),
       );
 
       const result = await app.export().test();
