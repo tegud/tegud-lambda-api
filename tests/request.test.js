@@ -40,6 +40,28 @@ describe("request", () => {
     expect(request.body).toEqual({ x: 1, y: 2 });
   });
 
+  describe("headers are set", () => {
+    it("sets headers to specfied values", () => {
+      const request = new Request({
+        headers: {
+          "x-forwarded-for": "127.0.0.1",
+        },
+      });
+
+      expect(request.headers["x-forwarded-for"]).toEqual("127.0.0.1");
+    });
+
+    it("sets header keys to lowercase", () => {
+      const request = new Request({
+        headers: {
+          "X-Forwarded-For": "127.0.0.1",
+        },
+      });
+
+      expect(request.headers["x-forwarded-for"]).toEqual("127.0.0.1");
+    });
+  });
+
   it("method is set from event httpMethod", () => {
     const request = new Request({
       httpMethod: "POST",
