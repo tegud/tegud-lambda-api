@@ -140,6 +140,16 @@ describe("request", () => {
     });
   });
 
+  it("sets auth", () => {
+    const request = new Request({
+      requestContext: {
+        authorizer: { claims: { a: 1 } },
+      },
+    });
+
+    expect(request.auth.claims.a).toEqual(1);
+  });
+
   describe("function info", () => {
     it("name is set", () => {
       const request = new Request({ }, {
