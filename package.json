@@ -1,6 +1,6 @@
 {
   "name": "tegud-lambda-api",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Helper functions to simplify AWS Lambda API Development",
   "main": "index.js",
   "scripts": {
@@ -31,6 +31,7 @@
     "test": "tests"
   },
   "dependencies": {
+    "cls-hooked": "^4.2.2",
     "luxon": "^1.17.2",
     "uuid": "^3.3.2"
   }
