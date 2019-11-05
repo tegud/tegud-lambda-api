@@ -150,6 +150,16 @@ describe("request", () => {
     expect(request.auth.claims.a).toEqual(1);
   });
 
+  it("sets requestId", () => {
+    const request = new Request({
+      requestContext: {
+        requestId: "12345abcde",
+      },
+    });
+
+    expect(request.requestId).toEqual("12345abcde");
+  });
+
   describe("function info", () => {
     it("name is set", () => {
       const request = new Request({ }, {
@@ -165,6 +175,16 @@ describe("request", () => {
       });
 
       expect(request.function.version).toEqual("$LATEST");
+    });
+
+    it("sets stage", () => {
+      const request = new Request({
+        requestContext: {
+          stage: "dev",
+        },
+      });
+
+      expect(request.function.stage).toEqual("dev");
     });
 
     it("arn is set", () => {
