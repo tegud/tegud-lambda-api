@@ -157,4 +157,36 @@ describe("handler", () => {
     await app.export().test({ }, { functionName: "test" });
     expect(executionOrder).toEqual([1, 2, 3]);
   });
+
+  it("executes exceptionHandler on handler exception", async () => {
+    const app = createApplication();
+    let loggedErrorMessage;
+
+    app
+      .addHandler("test", async () => {
+        throw new Error("ERROR!");
+      })
+      .handleException(async (e) => {
+        loggedErrorMessage = e.message;
+      });
+
+    await app.export().test({ }, { functionName: "test" });
+    expect(loggedErrorMessage).toEqual("ERROR!");
+  });
+
+  it("executes exceptionHandler and sets correct respnse", async () => {
+    const app = createApplication();
+
+    app
+      .addHandler("test", async () => {
+        throw new Error("ERROR!");
+      })
+      .handleException(async (e, req, res) => {
+        res.forbidden();
+      });
+
+    const result = await app.export().test();
+
+    expect(result.statusCode).toEqual(403);
+  });
 });
