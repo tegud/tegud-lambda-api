@@ -5,8 +5,10 @@ describe("response", () => {
     [
       { method: "ok", expectedStatusCode: 204 },
       { method: "ok", args: [{ }], expectedStatusCode: 200 },
+      { method: "badRequest", expectedStatusCode: 400 },
       { method: "unauthorized", expectedStatusCode: 401 },
       { method: "forbidden", expectedStatusCode: 403 },
+      { method: "notFound", expectedStatusCode: 404 },
       { method: "serviceUnavailable", expectedStatusCode: 503 },
     ].forEach(({ method, args = [], expectedStatusCode }) => {
       it(`${method} with ${!args.length ? "no arguments" : JSON.stringify(args)} returns ${expectedStatusCode} Status Code`, () => {
