@@ -189,4 +189,24 @@ describe("handler", () => {
 
     expect(result.statusCode).toEqual(403);
   });
+
+  it("executes exceptionHandler and sets correct respnse", async () => {
+    const app = createApplication();
+    let completeCalled = false;
+
+    app
+      .addHandler("test", async () => {
+        throw new Error("ERROR!");
+      })
+      .handleException((e, req, res) => {
+        res.notFound();
+      })
+      .handleComplete(async () => {
+        completeCalled = true;
+      });
+
+    await app.export().test();
+
+    expect(completeCalled).toEqual(true);
+  });
 });
