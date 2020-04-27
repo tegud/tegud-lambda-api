@@ -24,6 +24,12 @@ describe("message", () => {
     });
   });
 
+  it("sets awsRequestId", async () => {
+    const request = new Message(createSnsEnvelope({ }), { awsRequestId: "1234567" });
+
+    expect(request.awsRequestId).toEqual("1234567");
+  });
+
   describe("tegud-api message format v1", () => {
     it("sets framework version", async () => {
       const request = new Message(createSnsEnvelope({ frameworkVersion: 1 }));
@@ -41,6 +47,12 @@ describe("message", () => {
       const request = new Message(createSnsEnvelope({ requestId: "abcd1234" }));
 
       expect(request.requestId).toEqual("abcd1234");
+    });
+
+    it("sets requestId to awsRequestId if requestId not set", async () => {
+      const request = new Message(createSnsEnvelope({ }), { awsRequestId: "1234567" });
+
+      expect(request.requestId).toEqual("1234567");
     });
 
     describe("body", () => {
