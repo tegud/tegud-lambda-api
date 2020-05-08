@@ -2,9 +2,14 @@ const MockDate = require("mockdate");
 
 const Message = require("../lib/message");
 
-const createSnsEnvelope = message => ({
+const createSnsEnvelope = (message, attributes = {}) => ({
   Records: [
-    { Sns: { Message: JSON.stringify(message) } },
+    {
+      Sns: {
+        Message: message,
+        MessageAttributes: attributes,
+      },
+    },
   ],
 });
 
@@ -25,51 +30,51 @@ describe("message", () => {
   });
 
   it("sets awsRequestId", async () => {
-    const request = new Message(createSnsEnvelope({ }), { awsRequestId: "1234567" });
+    const request = new Message(createSnsEnvelope(""), { awsRequestId: "1234567" });
 
     expect(request.awsRequestId).toEqual("1234567");
   });
 
   describe("tegud-api message format v1", () => {
     it("sets framework version", async () => {
-      const request = new Message(createSnsEnvelope({ frameworkVersion: 1 }));
+      const request = new Message(createSnsEnvelope("", { frameworkVersion: { Type: "Number", Value: "1" } }));
 
       expect(request.frameworkVersion).toEqual(1);
     });
 
     it("sets message version", async () => {
-      const request = new Message(createSnsEnvelope({ messageVersion: 2 }));
+      const request = new Message(createSnsEnvelope("", { messageVersion: { Type: "Number", Value: "2" } }));
 
       expect(request.messageVersion).toEqual(2);
     });
 
     it("sets requestId", async () => {
-      const request = new Message(createSnsEnvelope({ requestId: "abcd1234" }));
+      const request = new Message(createSnsEnvelope("", { requestId: { Type: "String", Value: "abcd1234" } }));
 
       expect(request.requestId).toEqual("abcd1234");
     });
 
     it("sets requestId to awsRequestId if requestId not set", async () => {
-      const request = new Message(createSnsEnvelope({ }), { awsRequestId: "1234567" });
+      const request = new Message(createSnsEnvelope(""), { awsRequestId: "1234567" });
 
       expect(request.requestId).toEqual("1234567");
     });
 
     describe("body", () => {
       it("with no content-type parses json", async () => {
-        const request = new Message(createSnsEnvelope({ body: JSON.stringify({ a: 12345 }) }));
+        const request = new Message(createSnsEnvelope(JSON.stringify({ a: 12345 })));
 
         expect(request.body).toEqual({ a: 12345 });
       });
 
       it("json content type parse json", async () => {
-        const request = new Message(createSnsEnvelope({ "content-type": "application/json", body: JSON.stringify({ a: 12345 }) }));
+        const request = new Message(createSnsEnvelope(JSON.stringify({ a: 12345 }), { "content-type": { Type: "String", Value: "application/json" } }));
 
         expect(request.body).toEqual({ a: 12345 });
       });
 
       it("plain content type sets body to text", async () => {
-        const request = new Message(createSnsEnvelope({ "content-type": "text/plain", body: "12345" }));
+        const request = new Message(createSnsEnvelope("12345", { "content-type": { Type: "String", Value: "text/plain" } }));
 
         expect(request.body).toEqual("12345");
       });
